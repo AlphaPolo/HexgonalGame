@@ -2,13 +2,14 @@ import { Hex } from "../../pages/Hex";
 import { GameManager } from "../GameManager";
 import { StandardCharacter } from "../model/StandardCharacter";
 import { SelectHex } from "./SelectHex";
+import { SelectTarget } from "./SelectTarget";
 
-export class SelectUnit {
+export class SelectUnit extends SelectTarget<StandardCharacter> {
 
-    unsubscribe?: () => void;
     chainNext?: (unit: StandardCharacter) => boolean;
 
     constructor() {
+        super();
         this.bindUnit = this.bindUnit.bind(this);
     }
 
@@ -37,10 +38,6 @@ export class SelectUnit {
     complete() {
         // selecting will auto unsubcribe itself
         // this.unsubscribe?.();
-    }
-
-    cancel() {
-        this.unsubscribe?.();
     }
 
 }

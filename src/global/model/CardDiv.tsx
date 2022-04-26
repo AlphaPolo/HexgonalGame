@@ -1,7 +1,7 @@
 import canvasTxt from 'canvas-txt'
 import React from 'react';
 import { GameManager } from '../GameManager';
-import { MoveAbility } from './CardAbility';
+import { MoveAbility } from "./ability/MoveAbility";
 
 export enum CardType {
     NONE,

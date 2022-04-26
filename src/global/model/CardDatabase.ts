@@ -1,7 +1,9 @@
 import { Card, CardType } from "./Card";
 import dash from "../assets/dash.jpg"
 import attack from "../assets/attack.png"
-import { ActiveType, AttackAbility, MoveAbility } from "./CardAbility";
+import { ActiveType } from "./ability/CardAbility";
+import { MoveAbility } from "./ability/MoveAbility";
+import { AttackAbility } from "./ability/AttackAbility";
 
 export const CardList: Card[] = [
     new Card(CardType.COMMON, 0, "移動", "使用此卡片可在戰場上進行移動", 1, dash, new MoveAbility()),

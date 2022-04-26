@@ -57,6 +57,11 @@ export const cubeSubstract = (leftHex: Hex, rightHex: Hex): Hex => {
     return new Hex(leftHex.q - rightHex.q, leftHex.r - rightHex.r);
 };
 
+export const cubeDistance = (hexA: Hex, hexB: Hex) => {
+    const { q, r, s } = cubeSubstract(hexA, hexB);
+    return (Math.abs(q) + Math.abs(r) + Math.abs(s)) / 2;
+}
+
 export const checkSameHex = (leftHex?: Hex, rightHex?: Hex) => {
     if (leftHex?.q !== rightHex?.q)
         return false;

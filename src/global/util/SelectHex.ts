@@ -1,12 +1,13 @@
 import { Hex } from "../../pages/Hex";
 import { GameManager } from "../GameManager";
+import { SelectTarget } from "./SelectTarget";
 
-export class SelectHex {
+export class SelectHex extends SelectTarget<Hex> {
     
-    unsubscribe?: ()=> void;
     chainNext?: (hex: Hex) => boolean;
 
     constructor() {
+        super();
         this.onHexClick = this.onHexClick.bind(this);
     }
 
@@ -34,10 +35,6 @@ export class SelectHex {
     }
 
     complete() {
-        this.unsubscribe?.();
-    }
-
-    cancel() {
         this.unsubscribe?.();
     }
 

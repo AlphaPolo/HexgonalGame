@@ -2,14 +2,18 @@ import { StandardCharacter } from "./StandardCharacter";
 import model from "../assets/demon.png";
 import { Hex, hexToPoint, Point } from "../../pages/Hex";
 import { FPS } from "../const/MyConst";
+import { GameManager } from "../GameManager";
 
 
 enum DemonState {
     IDLE,
     WALKING,
     CLEAVE,
+    CLEAVE_PREPARE,
+    CLEAVE_LOOP,
+    CLEAVE_EXECUTE,
     HURT,
-    DEATH
+    DEATH,
 }
 
 export class Demon extends StandardCharacter {
@@ -41,10 +45,25 @@ export class Demon extends StandardCharacter {
         total: 12
     };
 
+    static cleavePrepare = {
+        start: 44,
+        total: 8
+    }
+
+    static cleaveLoop = {
+        start: 52,
+        total: 1
+    }
+
     static cleaveFrames = {
         start: 44,
         total: 15
     };
+
+    static cleaveExecute = {
+        start: 53,
+        total: 6
+    }
 
     static hurtFrames = {
         start: 66,
@@ -64,11 +83,16 @@ export class Demon extends StandardCharacter {
     progress: number = 0;
     perFpsP: number = 0;
 
+    animationComplete?: ((state: number) => void) | null;
+
     currentUseAnimate = () => {
         switch (this.currentState) {
             case DemonState.IDLE: return Demon.idleFrames;
             case DemonState.WALKING: return Demon.walkingFrames;
             case DemonState.CLEAVE: return Demon.cleaveFrames;
+            case DemonState.CLEAVE_PREPARE: return Demon.cleavePrepare;
+            case DemonState.CLEAVE_LOOP: return Demon.cleaveLoop;
+            case DemonState.CLEAVE_EXECUTE: return Demon.cleaveExecute;
             case DemonState.HURT: return Demon.hurtFrames;
             case DemonState.DEATH: return Demon.deathFrames;
             default: return Demon.idleFrames;
@@ -139,7 +163,11 @@ export class Demon extends StandardCharacter {
         let animate = this.currentUseAnimate();
         let start = animate.start;
         let total = animate.total;
-        if(this.frameIndex > total - 1) this.frameIndex = 0;
+        if(this.frameIndex > total - 1)
+        {
+            this.frameIndex = 0;
+            this.animationComplete?.(this.currentState);
+        }
         this.currentAnimateFrame = this.frameIndex + start;
     }
 
@@ -151,6 +179,19 @@ export class Demon extends StandardCharacter {
     faceLeft()
     {
         this.facing = 1;
+    }
+
+    facingTo(target: Hex) {
+        let startP = hexToPoint(this.position!);
+        let endP = hexToPoint(target);
+
+        if ((endP.x - startP.x) > 1) {
+            this.faceRight();
+        }
+
+        else {
+            this.faceLeft();
+        }
     }
 
     calcPerProgress(second: number) {
@@ -173,17 +214,32 @@ export class Demon extends StandardCharacter {
         this.moving = true;
         console.log("By", byAction);
         
-        let startP = hexToPoint(this.position!);
-        let endP = hexToPoint(this.moveTargetHex!);
+        this.facingTo(this.moveTargetHex!);
+    }
 
-        if((endP.x - startP.x) > 1)
+    attackTo(hexOrUnit: StandardCharacter | Hex): void {
+        console.log("Attack To");
+        let hex: Hex | null | undefined;
+        if(hexOrUnit instanceof StandardCharacter)
         {
-            this.faceRight();
+            hex = hexOrUnit.position;
         }
         else
         {
-            this.faceLeft();
+            hex = hexOrUnit;
         }
+        if(!hex) return;
+        
+        this.currentState = DemonState.CLEAVE_PREPARE;
+        this.frameIndex = 0;
+        this.animationComplete = (state) => {
+            GameManager.getInstance().getBoard()?.pushPreDraw(hex!);
+            GameManager.getInstance().getBoard()?.drawUpdate();
+            this.currentState = DemonState.CLEAVE_LOOP;
+            this.frameIndex = Demon.cleavePrepare.total - 1;
+            this.animationComplete = null;
+        }
+        this.facingTo(hex);
     }
 
 

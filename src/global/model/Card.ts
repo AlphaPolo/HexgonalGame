@@ -1,4 +1,5 @@
-import { CardAbility, MoveAbility } from './CardAbility';
+import { CardAbility } from './ability/CardAbility';
+import { MoveAbility } from "./ability/MoveAbility";
 import { StandardCharacter } from './StandardCharacter';
 
 export enum CardType {

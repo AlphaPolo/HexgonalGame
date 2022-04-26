@@ -55,7 +55,7 @@ export class RedHood extends StandardCharacter {
     };
 
     static lightAttackFrames = {
-        start: 55,
+        start: 56,
         total: 24
     };
 
@@ -82,6 +82,8 @@ export class RedHood extends StandardCharacter {
     moveTargetHex?: Hex | null;
     progress: number = 0;
     perFpsP: number = 0;
+
+    animationComplete?: ((state: number) => void) | null;
 
     currentUseAnimate = () => {
         switch (this.currentState) {
@@ -155,18 +157,15 @@ export class RedHood extends StandardCharacter {
     }
     
     updateGameObject(): void {
-        // this.counter++;
-        // if(this.counter > this.threshold)
-        // {
-        //     this.counter = 0;            
-            
-        // }
-        
         this.frameIndex ++;        
         let animate = this.currentUseAnimate();
         let start = animate.start;
         let total = animate.total;
-        if(this.frameIndex > total - 1) this.frameIndex = 0;
+        if(this.frameIndex > total - 1) 
+        {
+            this.frameIndex = 0;
+            this.animationComplete?.(this.currentState);
+        }
         this.currentAnimateFrame = this.frameIndex + start;
     }
 
@@ -224,9 +223,11 @@ export class RedHood extends StandardCharacter {
 
     attackTo(hexOrUnit: StandardCharacter | Hex): void {
         console.log("Attack To");
-        let hex;
+        let unit: StandardCharacter;
+        let hex: Hex | null | undefined;
         if(hexOrUnit instanceof StandardCharacter)
         {
+            unit = hexOrUnit;
             hex = hexOrUnit.position;
         }
         else
@@ -236,6 +237,12 @@ export class RedHood extends StandardCharacter {
         if(!hex) return;
         
         this.currentState = RedHoodState.LIGHT_ATTACK;
+        this.frameIndex = 0;
+        this.animationComplete = (state) => {
+            this.currentState = RedHoodState.IDLE;
+            this.frameIndex = RedHood.lightAttackFrames.total - 1;
+            this.animationComplete = null;
+        }
         this.facingTo(hex);
     }
 
@@ -269,12 +276,5 @@ export class RedHood extends StandardCharacter {
         this.progress = 0;
         this.perFpsP = 0;
     }
-
-    // resizeImage(ctx: CanvasRenderingContext2D) {
-    //     let midPosX = (this.perFrameW * scale) / 2;
-    //     let midPosY = (this.perFrameW * scale) / 2;
-    //     ctx.translate(-midPosX, -midPosY);
-    //     ctx.scale(scale, scale);
-    // }
 
 }
