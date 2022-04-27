@@ -1,4 +1,4 @@
-import { StandardCharacter } from "./StandardCharacter";
+import { CompleteType, StandardCharacter } from "./StandardCharacter";
 import model from "../assets/redhood.png";
 import { Hex, hexToPoint, Point } from "../../pages/Hex";
 import { FPS } from "../const/MyConst";
@@ -275,6 +275,8 @@ export class RedHood extends StandardCharacter {
         this.moveTargetHex = null;
         this.progress = 0;
         this.perFpsP = 0;
+
+        this.notifyComplete(CompleteType.MOVING);
     }
 
 }

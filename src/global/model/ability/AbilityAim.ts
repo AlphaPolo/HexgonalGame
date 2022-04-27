@@ -1,27 +1,22 @@
 import { SelectHex } from "../../util/SelectHex";
 import { SelectUnit } from "../../util/SelectUnit";
 import { StandardCharacter } from "../StandardCharacter";
-import { CardAbility, AimType } from "./CardAbility";
+import { CardAbility, AimType, BaseAbility } from "./CardAbility";
 
 
-export class AbilityAim implements CardAbility {
+export class AbilityAim extends BaseAbility {
     unsubscribe?: () => void;
     owner?: StandardCharacter;
     ability?: CardAbility;
     aimType: AimType;
 
     constructor(type: AimType) {
+        super();
         this.aimType = type;
         this.valid = this.valid.bind(this);
     }
 
-    setOwner(unit: StandardCharacter): void {
-        this.owner = unit;
-    }
-
-    use(listener?: () => void): void {
-        this.unsubscribe?.();
-
+    process(listener?: () => void): void {
         let selecting;
         switch (this.aimType) {
             case AimType.HEX: selecting = new SelectHex(); break;
@@ -33,13 +28,6 @@ export class AbilityAim implements CardAbility {
 
     valid(arg: any): boolean {
         return false;
-    }
-
-    complete() {
-    }
-
-    cancel(): void {
-        this.unsubscribe?.();
     }
 
 }

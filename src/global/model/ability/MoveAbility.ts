@@ -1,30 +1,25 @@
 import { getNeighbors, Hex } from "../../../pages/Hex";
 import { GameManager } from "../../GameManager";
 import { SelectHex } from "../../util/SelectHex";
-import { StandardCharacter } from "../StandardCharacter";
-import { CardAbility, EffectType } from "./CardAbility";
+import { CompleteType, StandardCharacter } from "../StandardCharacter";
+import { BaseAbility, CardAbility, EffectType } from "./CardAbility";
 
 
-export class MoveAbility implements CardAbility {
+export class MoveAbility extends BaseAbility {
     effect = EffectType.MOVEMENT;
     owner?: StandardCharacter;
-    unsubscribe?: () => void;
-    completeListener?: () => void;
     byAction?: string;
 
     constructor() {
+        super();
         this.onHexClick = this.onHexClick.bind(this);
-    }
-
-    setOwner(target: StandardCharacter) {
-        this.owner = target;
     }
 
     setAction(action: string) {
         this.byAction = action;
     }
 
-    use(listener?: () => void): void {
+    process(listener?: () => void): void {
         if (!this.owner)
             return;
 
@@ -32,8 +27,6 @@ export class MoveAbility implements CardAbility {
             console.log("Target not on hex");
             return;
         }
-
-        this.completeListener = listener;
 
         let selecting = new SelectHex();
         selecting.use(this.onHexClick);
@@ -47,6 +40,7 @@ export class MoveAbility implements CardAbility {
             selecting.cancel();
             board?.clearPreDraw();
             board?.drawUpdate();
+            this.unsubscribe = null;
         };
         console.log("CardUse");
     }
@@ -54,17 +48,30 @@ export class MoveAbility implements CardAbility {
     onHexClick(hex: Hex) {
         if (!this.owner)
             return true;
-        console.log("OnClick");
+        // console.log("OnClick");
         let targetP = this.owner.position;
-        let neigbor = getNeighbors(hex);
-        if (neigbor.find(hex => hex.q === targetP?.q &&
-            hex.r === targetP.r &&
-            hex.s === targetP.s
+        let neighbor = getNeighbors(hex);
+        if (neighbor.find(neighborHex => neighborHex.q === targetP?.q &&
+            neighborHex.r === targetP.r &&
+            neighborHex.s === targetP.s
         )) {
-            console.log("neighbor", hex);
-            // this.target.position = hex;
+            let units = GameManager.getInstance().getAllUnitOnBoard();
+            if(units.map(unit => unit.position).find(unitHex => unitHex?.q === hex.q &&
+                unitHex?.r === hex.r &&
+                unitHex?.s === hex.s))
+            {
+                console.log("Already has unit");
+                return false;
+            }
+            // console.log("neighbor", hex);
+            this.canCancel = false;
+            let com = () => {
+                this.complete();
+                console.log("Animation Complete");
+                this.owner?.detachComplete(CompleteType.MOVING, com);
+            }
+            this.owner.waitForComplete(CompleteType.MOVING, com)
             this.owner.moveTo(hex, this.byAction);
-            this.complete();
             return true;
         }
 
@@ -74,14 +81,4 @@ export class MoveAbility implements CardAbility {
         }
     }
 
-    complete() {
-        console.log("CardComplete");
-        this.unsubscribe?.();
-        this.completeListener?.();
-    }
-
-    cancel(): void {
-        console.log("CardCancel");
-        this.unsubscribe?.();
-    }
 }

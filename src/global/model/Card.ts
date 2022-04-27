@@ -64,7 +64,7 @@ export class Card {
         });
     }
 
-    cancel() {
-        this.ability.cancel();
+    cancel(): boolean {
+        return this.ability.cancel() ? true : this.ability.isCompleted();
     }
 }

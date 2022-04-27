@@ -3,7 +3,8 @@ export abstract class SelectTarget<T> {
     unsubscribe?: ()=> void;
     chainNext?: (arg: T) => boolean;
 
-    abstract use(chainNext: (arg: T) => boolean): void;
+    // Return ture if target is valid
+    abstract use(next: (arg: T) => boolean): void;
 
     abstract complete(): void;
 

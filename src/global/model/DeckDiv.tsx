@@ -27,13 +27,14 @@ export class DeckDiv extends React.Component<DeckProps, DeckState> {
     }
     
     initCards() {
-        let owner = GameManager.getInstance().getBoard()?.redhood;
+        let owner = GameManager.getInstance().getBoard()?.demon;
         this.state.cards.forEach(card => card.setOwner(owner!));
     }
 
     onCardSelected(card: Card, index: number) {
         let preSelectedCard = this.state.selectedCard;
-        preSelectedCard?.cancel();
+        let canCancel = preSelectedCard?.cancel() ?? true;
+        if(!canCancel) return;
         if(preSelectedCard !== card)
             this.setState({selectedCard: card}, () => {
                 const card = this.state.selectedCard;

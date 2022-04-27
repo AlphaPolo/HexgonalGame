@@ -35,7 +35,84 @@ export enum ActiveType {
 }
 
 export interface CardAbility {
-    use(complete?: () => void): void;
-    cancel(): void;
+    next?: CardAbility;
+    previous?: CardAbility;
+    toTop(): CardAbility;
+    use(complete?: (() => void) | null): void;
+    cancel(): boolean;
     setOwner(unit: StandardCharacter): void;
+    then(next: CardAbility): CardAbility;
+    isCompleted(): boolean;
+}
+
+export abstract class BaseAbility implements CardAbility {
+    
+    canCancel: boolean = true;
+    completed: boolean = false;
+    owner?: StandardCharacter;
+    next?: CardAbility;
+    previous?: CardAbility;
+    unsubscribe?: (() => void) | null;
+    completeListener?: (() => void) | null;
+
+    toTop(): CardAbility {
+        return this.previous?.toTop() ?? this;
+    }
+
+    run(complete?: () => void) {
+        this.toTop().use(complete);
+    }
+    
+    use(complete?: () => void): void {
+        this.completeListener = null;
+        this.unsubscribe?.();
+        this.preSettinig(complete);
+        this.process(complete);
+    }
+
+    private preSettinig(complete?: () => void) {
+        console.log("PreSetting", this.owner);
+        
+        if(this.owner) this.next?.setOwner(this.owner);
+        this.completeListener = complete;
+    }
+
+    abstract process(complete?: () => void): void;
+
+    cancel() {
+        if(!this.canCancel) return false;
+        this.unsubscribe?.();
+        return true;
+    }
+    
+    setOwner(unit: StandardCharacter): void {
+        this.owner = unit;
+    }
+
+    isCompleted() {
+        return this.completed;
+    }
+
+    complete() {
+        this.unsubscribe?.();
+        if(this.next != null) {
+            this.canCancel = false;
+            this.next.use(() => {
+                this.completeListener?.();
+                this.completed = true;
+            });
+        }
+        else
+        {
+            this.completed = true;
+            this.completeListener?.();
+        }
+    }
+
+    then(next: CardAbility): CardAbility {
+        next.previous = this;
+        this.next = next;
+        return this.next;
+    }
+
 }

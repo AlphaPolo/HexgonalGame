@@ -9,6 +9,8 @@ import "../index.css";
 import { StandardCharacter } from "../global/model/StandardCharacter";
 import { SelectUnit } from "../global/util/SelectUnit";
 import { Demon } from "../global/model/Demon";
+import { TestSelect } from "../global/util/TestSelect";
+import HexPad from "./HexPad";
 
 class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSize: number, startHexPoint: Point}> {
 
@@ -106,6 +108,12 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
         this.then = Date.now();
         this.startTime = this.then;
         this.animationID = requestAnimationFrame(this.gameLoop);
+
+        // let t = new TestSelect();
+        // t.use((hex) => {
+        //     console.log("TestSelect", hex);
+        //     return false;
+        // })
     }
     
     gameLoop() {
@@ -295,7 +303,8 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
                 <canvas ref={this.canvasGameObjectRender} height={this.state.canvasSize.canvasHeight} width={this.state.canvasSize.canvasWidth}
                 onMouseMove={this.handleMouseMove}
                 onMouseDown={this.handleMouseDown}/>
-                <canvas className="pad" height="300px" width="300px" style={{left: this.state.canvasSize.canvasWidth + 2, top: this.state.canvasSize.canvasHeight - 300}}/>
+                {/* <canvas className="pad" height="300px" width="300px" style={{left: this.state.canvasSize.canvasWidth + 2, top: this.state.canvasSize.canvasHeight - 300}}/> */}
+                <HexPad height={300} width={300} top={this.state.canvasSize.canvasHeight - 300} left={this.state.canvasSize.canvasWidth + 2} />
                 <DeckDiv style={{height: "250px", width: this.state.canvasSize.canvasWidth + 302, left: 0, top: this.state.canvasSize.canvasHeight + 2}}/>
                 {/* <canvas ref={this.canvasDeck}
                     className="deck" height="250px" width={this.state.canvasSize.canvasWidth + 302} style={{left: 0, top: this.state.canvasSize.canvasHeight + 2}}/> */}

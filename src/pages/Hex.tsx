@@ -41,6 +41,14 @@ export const CubeDirection: Readonly<Readonly<Hex>[]> = [
     new Hex(-1, 1), new Hex(-1, 0), new Hex(0, -1)
 ];
 
+export function* genNeighbors(hex: Hex) {
+    let i = 0;
+    for(let direction of CubeDirection)
+    {
+        yield { hex: cubeAdd(hex, direction), direction: (i++) as HexDirection};
+    }
+}
+
 export const getNeighbors = (hex: Hex) => {
     return CubeDirection.map(direction => cubeAdd(hex, direction));
 }

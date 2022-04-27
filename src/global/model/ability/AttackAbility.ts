@@ -3,20 +3,19 @@ import { SelectHex } from "../../util/SelectHex";
 import { SelectTarget } from "../../util/SelectTarget";
 import { SelectUnit } from "../../util/SelectUnit";
 import { StandardCharacter } from "../StandardCharacter";
-import { CardAbility, ActiveType, AimType, TargetType } from "./CardAbility";
+import { CardAbility, ActiveType, AimType, TargetType, BaseAbility } from "./CardAbility";
 
 
 
-export class AttackAbility implements CardAbility {
+export class AttackAbility extends BaseAbility {
 
     owner?: StandardCharacter;
     activeType: ActiveType;
     aimType: AimType = AimType.UNIT;
     targetType: TargetType = TargetType.ENEMY;
-    unsubscribe?: () => void;
-    completeListener?: () => void;
 
     constructor(activeType: ActiveType, aimType?: AimType, targetType?: TargetType) {
+        super();
         this.activeType = activeType;
         this.aimType = aimType ?? this.aimType;
         this.targetType = targetType ?? this.targetType;
@@ -24,12 +23,7 @@ export class AttackAbility implements CardAbility {
         this.onUnitClick = this.onUnitClick.bind(this);
     }
 
-    setOwner(unit: StandardCharacter): void {
-        this.owner = unit;
-    }
-
-
-    use(listener?: () => void): void {
+    process(listener?: () => void): void {
         if (!this.owner)
             return;
 
@@ -37,7 +31,6 @@ export class AttackAbility implements CardAbility {
             console.log("Target not on hex");
             return;
         }
-        this.completeListener = listener;
 
         let selecting: SelectTarget<any>;
 
@@ -48,6 +41,7 @@ export class AttackAbility implements CardAbility {
 
         this.unsubscribe = () => {
             selecting?.cancel();
+            this.unsubscribe = null;
         };
     }
 
@@ -86,15 +80,6 @@ export class AttackAbility implements CardAbility {
             this.complete();
             return true;
         }
-    }
-
-    complete() {
-        this.unsubscribe?.();
-        this.completeListener?.();
-    }
-
-    cancel(): void {
-        this.unsubscribe?.();
     }
 
 }

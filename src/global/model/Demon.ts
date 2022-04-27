@@ -1,4 +1,4 @@
-import { StandardCharacter } from "./StandardCharacter";
+import { CompleteType, StandardCharacter } from "./StandardCharacter";
 import model from "../assets/demon.png";
 import { Hex, hexToPoint, Point } from "../../pages/Hex";
 import { FPS } from "../const/MyConst";
@@ -159,7 +159,7 @@ export class Demon extends StandardCharacter {
     
     updateGameObject(): void {
         
-        this.frameIndex ++;        
+        this.frameIndex += 0.5;        
         let animate = this.currentUseAnimate();
         let start = animate.start;
         let total = animate.total;
@@ -168,7 +168,7 @@ export class Demon extends StandardCharacter {
             this.frameIndex = 0;
             this.animationComplete?.(this.currentState);
         }
-        this.currentAnimateFrame = this.frameIndex + start;
+        this.currentAnimateFrame = Math.trunc(this.frameIndex + start);
     }
 
     faceRight()
@@ -251,6 +251,7 @@ export class Demon extends StandardCharacter {
         this.moveTargetHex = null;
         this.progress = 0;
         this.perFpsP = 0;
+        this.notifyComplete(CompleteType.MOVING);
     }
 
 }
