@@ -15,10 +15,12 @@ export enum EffectType {
     INVINCIBLE
 }
 
+
 export enum AimType {
     HEX,
     UNIT,
-    POSITION
+    POSITION,
+    DIRECTION
 }
 
 // Ability require type

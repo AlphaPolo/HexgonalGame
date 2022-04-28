@@ -1,4 +1,5 @@
-import { cubeDistance, getNeighbors, Hex } from "../../../pages/Hex";
+import { cubeAdd, cubeDistance, getNeighbors, Hex } from "../../../pages/Hex";
+import { SelectDirection } from "../../util/SelectDirection";
 import { SelectHex } from "../../util/SelectHex";
 import { SelectTarget } from "../../util/SelectTarget";
 import { SelectUnit } from "../../util/SelectUnit";
@@ -21,6 +22,7 @@ export class AttackAbility extends BaseAbility {
         this.targetType = targetType ?? this.targetType;
         this.onHexClick = this.onHexClick.bind(this);
         this.onUnitClick = this.onUnitClick.bind(this);
+        this.onDirectionClick = this.onDirectionClick.bind(this);
     }
 
     process(listener?: () => void): void {
@@ -37,6 +39,7 @@ export class AttackAbility extends BaseAbility {
         switch (this.aimType) {
             case AimType.HEX: selecting = new SelectHex(); selecting.use(this.onHexClick); break;
             case AimType.UNIT: selecting = new SelectUnit(); selecting.use(this.onUnitClick); break;
+            case AimType.DIRECTION: selecting = new SelectDirection; selecting.use(this.onDirectionClick); break;
         }
 
         this.unsubscribe = () => {
@@ -80,6 +83,15 @@ export class AttackAbility extends BaseAbility {
             this.complete();
             return true;
         }
+    }
+
+    onDirectionClick(hex: Hex) {
+        if (!this.owner)
+            return true;
+        let targetHex = cubeAdd(this.owner.position!, hex)
+        this.owner.attackTo(targetHex);
+        this.complete();
+        return true;
     }
 
 }

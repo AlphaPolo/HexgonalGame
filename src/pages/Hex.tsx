@@ -57,6 +57,25 @@ export const getCubeNeighbor = (hex: Hex, direction: HexDirection) => {
     return cubeAdd(hex, CubeDirection[direction]);
 };
 
+export const cubeRound = (cube: Cube): Cube => {
+    let q = Math.round(cube.q);
+    let r = Math.round(cube.r);
+    let s = Math.round(cube.s);
+
+    let q_diff = Math.abs(q - cube.q);
+    let r_diff = Math.abs(r - cube.r);
+    let s_diff = Math.abs(s - cube.s);
+
+    if (q_diff > r_diff && q_diff > s_diff)
+        q = -r-s
+    else if (r_diff > s_diff)
+        r = -q-s
+    else
+        s = -q-r
+
+    return {q: q, r: r, s: s}
+}
+
 export const cubeAdd = (leftHex: Hex, rightHex: Hex): Hex => {
     return new Hex(leftHex.q + rightHex.q, leftHex.r + rightHex.r);
 };
@@ -70,7 +89,7 @@ export const cubeDistance = (hexA: Hex, hexB: Hex) => {
     return (Math.abs(q) + Math.abs(r) + Math.abs(s)) / 2;
 }
 
-export const checkSameHex = (leftHex?: Hex, rightHex?: Hex) => {
+export const checkSameHex = (leftHex?: Hex | null, rightHex?: Hex | null) => {
     if (leftHex?.q !== rightHex?.q)
         return false;
     if (leftHex?.r !== rightHex?.r)

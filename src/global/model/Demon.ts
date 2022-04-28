@@ -18,23 +18,6 @@ enum DemonState {
 
 export class Demon extends StandardCharacter {
 
-    spritesheet: HTMLImageElement | undefined;
-    width: number = 1463;
-    height: number = 1344;
-    frameIndex: number = 0;
-    col = 22;
-    row = 5;
-    offsetY = 0;
-    perFrameW = 0;
-    perFrameH = 0;
-    renderFrameW = 0;
-    renderFrameH = 0;
-    scale = 0.8;
-
-    // totalFrames = 127;
-
-    facing: 1 | -1 = 1;
-
     static idleFrames = {
         start: 0,
         total: 6
@@ -76,14 +59,6 @@ export class Demon extends StandardCharacter {
     };
 
     currentState: DemonState = DemonState.IDLE;
-    currentAnimateFrame = 0;
-
-    moving: boolean = false;
-    moveTargetHex?: Hex | null;
-    progress: number = 0;
-    perFpsP: number = 0;
-
-    animationComplete?: ((state: number) => void) | null;
 
     currentUseAnimate = () => {
         switch (this.currentState) {
@@ -101,6 +76,11 @@ export class Demon extends StandardCharacter {
     
     constructor(hp: number, mp: number, stamina: number) {
         super(hp, mp, stamina);
+        this.col = 22;
+        this.row = 5;
+        this.offsetY = 0;
+        this.scale = 0.8;
+
         let img = new Image();
         img.src = model;
         img.onload = () => {
@@ -116,7 +96,7 @@ export class Demon extends StandardCharacter {
         }
         // this.position = hex;
     }
-    logonce = true;
+
     draw(ctx: CanvasRenderingContext2D, startPoint: Point, callback: any) {
         if(!this.spritesheet) return;
         if(!this.position) return;
@@ -169,34 +149,6 @@ export class Demon extends StandardCharacter {
             this.animationComplete?.(this.currentState);
         }
         this.currentAnimateFrame = Math.trunc(this.frameIndex + start);
-    }
-
-    faceRight()
-    {
-        this.facing = -1;
-    }
-
-    faceLeft()
-    {
-        this.facing = 1;
-    }
-
-    facingTo(target: Hex) {
-        let startP = hexToPoint(this.position!);
-        let endP = hexToPoint(target);
-
-        if ((endP.x - startP.x) > 1) {
-            this.faceRight();
-        }
-
-        else {
-            this.faceLeft();
-        }
-    }
-
-    calcPerProgress(second: number) {
-        let perFpsProgress = 1 / FPS / second;
-        return perFpsProgress;
     }
 
     // callAction(action: string, ...arg: any): void {

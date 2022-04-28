@@ -60,6 +60,12 @@ canvas {
   transform: translate(0px, -10px);
 }
 
+.command-list {
+  display: flex;
+  min-height: 1px;
+  box-sizing: border-box;
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

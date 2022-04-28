@@ -1,9 +1,11 @@
 import { OnCurrentHexChange, OnHexClick } from "../pages/Hex";
+import HexPad from "../pages/HexPad";
 import MyCanvas from "../pages/MyCanvas";
 
 export class GameManager {
     private static instance: GameManager;
     private _board?: MyCanvas;
+    private _pad?: HexPad;
 
 
     public getBoard(): MyCanvas | null | undefined {
@@ -12,6 +14,14 @@ export class GameManager {
 
     public setBoard(value: MyCanvas) {
         this._board = value;
+    }
+
+    public getPad(): HexPad | null | undefined {
+        return this._pad;
+    }
+
+    public setPad(value: HexPad) {
+        this._pad = value;
     }
     /**
      * The Singleton's constructor should always be private to prevent direct
@@ -47,6 +57,14 @@ export class GameManager {
 
     public detachOnHexClick(onHexClick: OnHexClick) {
         this._board?.oHexClick.detach(onHexClick);
+    }
+
+    public attachOnDirectionClick(onDirectionClick: OnHexClick) {
+        this._pad?.oHexClick.attach(onDirectionClick);
+    }
+
+    public detachOnDirectionClick(onHexClick: OnHexClick) {
+        this._pad?.oHexClick.detach(onHexClick);
     }
 
     public getAllUnitOnBoard() {

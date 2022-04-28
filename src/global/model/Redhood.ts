@@ -16,23 +16,6 @@ enum RedHoodState {
 
 export class RedHood extends StandardCharacter {
 
-    spritesheet: HTMLImageElement | undefined;
-    width: number = 1463;
-    height: number = 1344;
-    frameIndex: number = 0;
-    col = 12;
-    row = 11;
-    offsetY = 36;
-    perFrameW = 0;
-    perFrameH = 0;
-    renderFrameW = 0;
-    renderFrameH = 0;
-    scale = 1.5;
-
-    totalFrames = 127;
-
-    facing: 1 | -1 = 1;
-
     static idleFrames = {
         start: 0,
         total: 1
@@ -74,16 +57,8 @@ export class RedHood extends StandardCharacter {
     };
 
     currentState: RedHoodState = RedHoodState.IDLE;
-    currentAnimateFrame = 0;
-    counter = 0;
-    threshold = 3;
 
-    moving: boolean = false;
-    moveTargetHex?: Hex | null;
-    progress: number = 0;
-    perFpsP: number = 0;
 
-    animationComplete?: ((state: number) => void) | null;
 
     currentUseAnimate = () => {
         switch (this.currentState) {
@@ -100,6 +75,12 @@ export class RedHood extends StandardCharacter {
     
     constructor(hp: number, mp: number, stamina: number) {
         super(hp, mp, stamina);
+
+        this.col = 12;
+        this.row = 11;
+        this.offsetY = 36;
+        this.scale = 1.5;
+
         let img = new Image();
         img.src = model;
         img.onload = () => {
@@ -132,7 +113,7 @@ export class RedHood extends StandardCharacter {
         if(this.moving)
         {
             this.progress = Math.min(this.progress + this.perFpsP, 1);
-            console.log("Moving", this.progress);
+            // console.log("Moving", this.progress);
             let point2 = callback(this.moveTargetHex!, startPoint);
             point.x = point.x + (point2.x - point.x) * (this.progress);
             point.y = point.y + (point2.y - point.y) * (this.progress);
@@ -169,16 +150,6 @@ export class RedHood extends StandardCharacter {
         this.currentAnimateFrame = this.frameIndex + start;
     }
 
-    faceRight()
-    {
-        this.facing = -1;
-    }
-
-    faceLeft()
-    {
-        this.facing = 1;
-    }
-
     calcPerProgress(second: number) {
         let perFpsProgress = 1 / FPS / second;
         return perFpsProgress;
@@ -197,28 +168,15 @@ export class RedHood extends StandardCharacter {
         this.perFpsP = this.calcPerProgress(0.8);
         this.moveTargetHex = hex;
         this.moving = true;
-        console.log("By", byAction);
+        // console.log("By", byAction);
         
-        switch(byAction) {
-            case "slide":
-                this.currentState = RedHoodState.SLIDE;
-                this.perFpsP = this.calcPerProgress(0.5);
-        }
+        // switch(byAction) {
+        //     case "slide":
+        //         this.currentState = RedHoodState.SLIDE;
+        //         this.perFpsP = this.calcPerProgress(0.5);
+        // }
 
         this.facingTo(this.moveTargetHex!);
-    }
-
-    facingTo(target: Hex) {
-        let startP = hexToPoint(this.position!);
-        let endP = hexToPoint(target);
-
-        if ((endP.x - startP.x) > 1) {
-            this.faceRight();
-        }
-
-        else {
-            this.faceLeft();
-        }
     }
 
     attackTo(hexOrUnit: StandardCharacter | Hex): void {

@@ -27,7 +27,7 @@ export class DeckDiv extends React.Component<DeckProps, DeckState> {
     }
     
     initCards() {
-        let owner = GameManager.getInstance().getBoard()?.demon;
+        let owner = GameManager.getInstance().getBoard()?.redhood;
         this.state.cards.forEach(card => card.setOwner(owner!));
     }
 

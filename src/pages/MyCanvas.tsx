@@ -4,7 +4,7 @@ import { DeckDiv } from "../global/model/DeckDiv";
 import { Obserable } from "../global/model/Obserable";
 import { RedHood } from "../global/model/Redhood";
 import { FPS } from "../global/const/MyConst";
-import { CanvasSizeState, Point, Rect, Hex, OnCurrentHexChange, CubeDirection, getCubeNeighbor, Cube, checkSameHex, OnHexClick, HexDirection } from "./Hex";
+import { CanvasSizeState, Point, Rect, Hex, OnCurrentHexChange, CubeDirection, getCubeNeighbor, Cube, checkSameHex, OnHexClick, HexDirection, cubeRound } from "./Hex";
 import "../index.css";
 import { StandardCharacter } from "../global/model/StandardCharacter";
 import { SelectUnit } from "../global/util/SelectUnit";
@@ -150,8 +150,6 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
         cancelAnimationFrame(this.animationID);
     }
 
-    
-
     drawHexes(ctx: CanvasRenderingContext2D) {
         let start = this.state.startHexPoint;
         const { canvasWidth, canvasHeight } = this.state.canvasSize;
@@ -258,30 +256,6 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
         return { q: q, r: r, s: -q-r}
     }
 
-
-    cubeRound(cube: Cube) {
-        let q = Math.round(cube.q);
-        let r = Math.round(cube.r);
-        let s = Math.round(cube.s);
-
-        let q_diff = Math.abs(q - cube.q);
-        let r_diff = Math.abs(r - cube.r);
-        let s_diff = Math.abs(s - cube.s);
-
-        if (q_diff > r_diff && q_diff > s_diff)
-            q = -r-s
-        else if (r_diff > s_diff)
-            r = -q-s
-        else
-            s = -q-r
-
-        return this.Cube(q, r, s);
-    }
-
-    Cube(q: number, r: number, s: number): Cube {
-        return {q: q, r: r, s: s}
-    }
-
     // axial_round(hex: Hex) {
     //     return cube_to_axial(cube_round(axial_to_cube(hex)))
     // }
@@ -320,7 +294,7 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
             y: e.pageY - this.canvasBounds.top
         }
         let floatHex = this.pixelToPointyHex(pointOnCanvas);
-        let cube = this.cubeRound(floatHex);
+        let cube = cubeRound(floatHex);
         let roundHex = new Hex(cube.q, cube.r);
         // let hexPoint = this.hexToPixel(roundHex, this.state.startHexPoint);
         
@@ -346,7 +320,7 @@ class MyCanvas extends React.Component<any, { canvasSize: CanvasSizeState, hexSi
             y: e.pageY - this.canvasBounds.top
         }
         let floatHex = this.pixelToPointyHex(pointOnCanvas);
-        let cube = this.cubeRound(floatHex);
+        let cube = cubeRound(floatHex);
         let roundHex = new Hex(cube.q, cube.r);
         // this.drawHex(ctx, hexPoint, "Green", 2);
         this.oHexClick.notify([roundHex, e.nativeEvent.button]);
